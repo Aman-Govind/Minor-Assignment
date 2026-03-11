@@ -1,67 +1,45 @@
-# Minimal Spanning Tree Based Medical Image Segmentation
+# MST-Based Medical Image Segmentation and Denoising
 
 ## Overview
 
-This project implements a **graph-based image segmentation technique** using the **Minimum Spanning Tree (MST)** approach inspired by **Kruskal’s algorithm**.
+This project demonstrates the application of **Minimum Spanning Trees (MST)** in **medical image processing**. The algorithm is inspired by **Kruskal’s algorithm** and is used to perform **image segmentation and denoising** on grayscale medical images such as MRI, CT scans, and X-rays.
 
-The goal is to apply concepts from **graph theory and computational mathematics** to **medical image processing**, specifically for **image segmentation and noise reduction**.
+Each pixel of the image is treated as a **node in a graph**, and edges connect neighboring pixels. The edge weights are determined by the difference in pixel intensity. Using an MST-based approach, similar pixels are grouped into segments while preserving important boundaries.
 
-Each pixel in a grayscale medical image is treated as a **node in a graph**, and edges connect neighboring pixels. The difference in pixel intensity defines the **edge weight**, which determines how pixels are grouped into segments.
-
-The algorithm groups similar pixels into regions and performs **segment-based denoising** to improve image clarity.
-
----
-
-## Objectives
-
-* Convert medical images into **graph representations**
-* Implement **MST-based segmentation**
-* Apply **segment-level denoising**
-* Analyze results using **quantitative metrics**
-* Visualize segmentation outcomes
-
----
-
-## Features
-
-* Graph construction from grayscale images
-* Kruskal-inspired **Minimum Spanning Tree segmentation**
-* **Union-Find data structure** for component management
-* Segment-based **image denoising**
-* Performance evaluation using:
-
-  * Mean Squared Error (MSE)
-  * Peak Signal-to-Noise Ratio (PSNR)
-* Automatic generation of:
-
-  * segmentation visualization
-  * denoised images
-  * segment distribution histogram
+After segmentation, **segment-based denoising** is applied by replacing pixel values with the mean intensity of their respective segments.
 
 ---
 
 ## Project Structure
 
 ```
-mst-medical-segmentation/
+.
+├── mst_medical_segmentation.py     # Main Python implementation
+├── brain_mri.png                   # MRI test image
+├── chest_xray.png                  # Chest X-ray test image
+├── ct_scan.png                     # CT scan test image
+├── Minor assignment REPORT.pdf     # Assignment report
 │
-├── mst_image_processing.py
-├── brain_mri.png
-├── chest_xray.png
-├── ct_scan.png
-│
-├── output_results/
-│   ├── *_result.png
-│   ├── *_segments.png
-│
-└── README.md
+└── output_results/                 # Generated output images
 ```
+
+---
+
+## Features
+
+* Graph representation of images
+* MST-based image segmentation
+* Union-Find data structure for efficient merging
+* Segment-based image denoising
+* Performance evaluation using MSE and PSNR
+* Visualization of segmentation results
+* Histogram showing segment distribution
 
 ---
 
 ## Required Libraries
 
-Install the required Python libraries:
+Install the necessary Python libraries before running the program:
 
 ```
 pip install numpy matplotlib scikit-image
@@ -69,61 +47,61 @@ pip install numpy matplotlib scikit-image
 
 ---
 
-## How the Algorithm Works
+## Algorithm Steps
 
-### 1. Graph Representation
+### 1. Image Loading
 
-Each pixel is treated as a vertex in a graph.
+Medical images are loaded and converted into **grayscale format**.
 
-Edges connect **4-neighbour pixels**:
+---
+
+### 2. Graph Construction
+
+Each pixel is considered a vertex in a graph.
+
+Edges are created between **4-neighbour pixels**:
 
 * Up
 * Down
 * Left
 * Right
 
-Edge weight is defined as:
+The weight of each edge is calculated as:
 
 ```
 w = |I(p1) − I(p2)|
 ```
 
-where
-`I(p)` is the pixel intensity.
+where `I(p)` represents pixel intensity.
 
 ---
 
-### 2. MST Segmentation
+### 3. MST-Based Segmentation
 
-The algorithm processes edges in **increasing order of weight** and merges pixel components if the difference between them satisfies a **threshold condition**.
+Edges are sorted by weight and processed using a **Union-Find structure**.
 
-This ensures that:
-
-* similar pixels are grouped
-* strong boundaries are preserved
+Two components are merged if the edge weight satisfies a **threshold condition**, ensuring that similar pixels belong to the same segment.
 
 ---
 
-### 3. Segment-Based Denoising
+### 4. Segment-Based Denoising
 
-After segmentation, each segment is replaced with its **average pixel intensity**:
+For each segment:
 
 ```
-I_denoised(p) = average intensity of pixels in segment
+new_pixel_value = mean intensity of all pixels in that segment
 ```
 
-This reduces noise while preserving important structures.
+This helps reduce noise while maintaining structural boundaries.
 
 ---
 
 ## Evaluation Metrics
 
-The performance of the algorithm is evaluated using:
-
 ### Mean Squared Error (MSE)
 
 ```
-MSE = mean((original - denoised)^2)
+MSE = mean((original − denoised)^2)
 ```
 
 Lower values indicate better denoising.
@@ -133,72 +111,51 @@ Lower values indicate better denoising.
 ### Peak Signal-to-Noise Ratio (PSNR)
 
 ```
-PSNR = 20 * log10(255 / sqrt(MSE))
+PSNR = 20 log10(255 / √MSE)
 ```
 
-Higher PSNR indicates better reconstruction quality.
+Higher PSNR values indicate better reconstruction quality.
 
 ---
 
-## Running the Program
+## How to Run
 
-Run the Python script:
+Run the program using:
 
 ```
-python mst_image_processing.py
+python mst_medical_segmentation.py
 ```
 
-The program will:
+The script will:
 
-1. Load the medical images
-2. Perform MST-based segmentation
+1. Load the three test images
+2. Perform segmentation
 3. Apply denoising
-4. Compute performance metrics
-5. Save visualization results
+4. Calculate evaluation metrics
+5. Save output images in `output_results/`
 
 ---
 
-## Example Output
+## Output
 
-For each image the program outputs:
+For each input image, the program generates:
 
-* Number of segments
-* Execution time
-* MSE
-* PSNR
-* Visualization images
-* Segment histogram
+* Segmented visualization
+* Denoised image
+* Segment distribution histogram
+* Performance metrics (MSE, PSNR, execution time)
 
-Results are saved in the `output_results` folder.
+All results are saved inside the **output_results** folder.
 
 ---
 
 ## Applications
 
-MST-based segmentation can be applied in:
-
 * MRI analysis
-* CT scan interpretation
-* Tumor detection
-* Anatomical structure identification
-* Medical image denoising
-
----
-
-## Limitations
-
-* Processing time increases with large images
-* Performance depends on the chosen threshold parameter
-* May produce over-segmentation in highly textured images
-
----
-
-## Future Improvements
-
-* GPU acceleration
-* Adaptive threshold optimization
-* Integration with deep learning segmentation models
-* Support for 3D medical images
+* CT scan segmentation
+* X-ray image enhancement
+* Tumor and anatomical structure detection
+* Medical image noise reduction
 
 ---
 
@@ -206,5 +163,4 @@ MST-based segmentation can be applied in:
 
 Aman Govind
 B.Tech Computer Science
-
 
